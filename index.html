@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco del Diablo</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #c1121f;
+    --dark-red: #7a0c15;
+    --gold: #b8962e;
+    --bg: #0b0b0b;
+    --surface: #111;
+    --border: #2a2a2a;
+    --text: #e8e0d0;
+    --muted: #888;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ─────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(193,18,31,0.18) 0%, transparent 60%),
+                linear-gradient(180deg, #150000 0%, #0b0b0b 100%);
+    z-index: 1;
+  }
+
+  .hero-text {
+    position: relative;
+    z-index: 2;
+    padding: 80px 60px 80px 80px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Oswald', sans-serif;
+    font-size: .75rem;
+    letter-spacing: .4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    font-weight: 700;
+    line-height: .95;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    letter-spacing: .02em;
+  }
+
+  .hero h1 span {
+    color: var(--gold);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    display: block;
+    font-size: .65em;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: #bbb;
+    max-width: 440px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .hero-cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    transition: background .2s;
+  }
+  .btn-primary:hover { background: var(--dark-red); }
+
+  .btn-outline {
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 14px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    transition: background .2s, color .2s;
+  }
+  .btn-outline:hover { background: var(--gold); color: #000; }
+
+  .hero-image {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+
+  .hero-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #0b0b0b 0%, transparent 40%),
+                linear-gradient(0deg, #0b0b0b 0%, transparent 30%);
+  }
+
+  /* ── DIVIDER ──────────────────────────────────── */
+  .divider {
+    text-align: center;
+    padding: 40px 20px 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: .7rem;
+    letter-spacing: .5em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '──────── ';
+  }
+  .divider::after {
+    content: ' ────────';
+  }
+
+  /* ── BILLETES SHOWCASE ───────────────────────── */
+  .showcase {
+    padding: 60px 40px;
+    max-width: 1300px;
+    margin: auto;
+  }
+
+  .showcase-header {
+    margin-bottom: 48px;
+  }
+
+  .section-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: .7rem;
+    letter-spacing: .4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  /* Full-width billete */
+  .billete-full {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .billete-full img {
+    width: 100%;
+    display: block;
+    transition: transform .6s ease;
+  }
+
+  .billete-full:hover img { transform: scale(1.02); }
+
+  /* Side-by-side billetes */
+  .billete-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .billete-card {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+    background: #0e0e0e;
+  }
+
+  .billete-card img {
+    width: 100%;
+    display: block;
+    transition: transform .6s ease;
+  }
+  .billete-card:hover img { transform: scale(1.03); }
+
+  .billete-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 20px;
+    background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 100%);
+    font-family: 'Oswald', sans-serif;
+    font-size: .75rem;
+    letter-spacing: .25em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* ── SE BUSCA + ENGRAVING ROW ────────────────── */
+  .feature-row {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 24px;
+    max-width: 1300px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+  }
+
+  .feature-card {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+    background: #0e0e0e;
+  }
+  .feature-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s ease;
+  }
+  .feature-card:hover img { transform: scale(1.03); }
+
+  .feature-card .billete-label { font-size: .7rem; }
+
+  /* ── TIPOS DE CUENTA ─────────────────────────── */
+  .section {
+    padding: 80px 40px;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 32px 28px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .3s;
+  }
+
+  .card:hover { border-color: var(--red); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+  }
+
+  .card h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: .05em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .card p { color: #aaa; line-height: 1.6; }
+
+  /* ── FORM ────────────────────────────────────── */
+  form {
+    display: grid;
+    gap: 14px;
+    max-width: 620px;
+    margin: 40px auto 0;
+  }
+
+  input, select, textarea {
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #181818;
+    color: white;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color .2s;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--red); }
+
+  select option { background: #181818; }
+
+  button {
+    padding: 16px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    transition: background .2s;
+  }
+  button:hover { background: var(--dark-red); }
+
+  /* ── PRINCIPIOS ──────────────────────────────── */
+  .principios {
+    padding: 80px 40px;
+    max-width: 900px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .principios ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+    text-align: left;
+  }
+
+  .principios li {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #ccc;
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .principios li::before {
+    content: '✦';
+    position: absolute;
+    left: 16px;
+    color: var(--gold);
+  }
+
+  /* ── FOOTER ──────────────────────────────────── */
+  .footer {
+    text-align: center;
+    padding: 60px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: .9rem;
+  }
+
+  .footer strong {
+    font-family: 'Oswald', sans-serif;
+    color: var(--red);
+    font-size: 1.3rem;
+    display: block;
+    margin-bottom: 12px;
+    letter-spacing: .15em;
+  }
+
+  .note { margin-top: 8px; font-size: .8rem; color: #555; }
+
+  /* ── RESPONSIVE ──────────────────────────────── */
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-image { height: 50vh; }
+    .hero-text { padding: 60px 24px; }
+    .billete-row { grid-template-columns: 1fr; }
+    .feature-row { grid-template-columns: 1fr; padding: 0 20px; }
+    .showcase { padding: 40px 20px; }
+    .section { padding: 60px 20px; }
+    .principios { padding: 60px 20px; }
+    .principios ul { grid-template-columns: 1fr; }
+  }
+
+  /* ── RESULT CARD ─────────────────────────────── */
+  #resultado .card {
+    margin-top: 24px;
+    border-color: var(--gold);
+  }
+  #resultado .card h3 {
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="hero-eyebrow">MM2400 · Serie 199X</p>
+    <h1>
+      Banco<br>del Diablo
+      <span>Ambición · Dinero · Génesis</span>
+    </h1>
+    <p class="hero-subtitle">
+      La primera institución financiera ficticia para artistas, productores,
+      grafiteros, tatuadores y creadores. No acumulamos dinero. Acumulamos ambición.
+    </p>
+    <div class="hero-cta-row">
+      <a href="#cuenta" class="btn-primary">Abrir Cuenta</a>
+      <a href="#galeria" class="btn-outline">Ver Billetes</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="img1_hero.png" alt="Banco del Diablo - Portada">
+  </div>
+</section>
+
+<div class="divider">Ambición · Dinero · Diablo · Génesis</div>
+
+<!-- ═══ GALERÍA DE BILLETES ══════════════════════════ -->
+<div class="showcase" id="galeria">
+  <div class="showcase-header">
+    <p class="section-label">Colección Oficial</p>
+    <h2 class="section-title">Los Billetes del Diablo</h2>
+  </div>
+
+  <!-- Billete full width - Banco de Mi Mundo (frente y reverso) -->
+  <div class="billete-full">
+    <img src="img6_banco_mi_mundo.png" alt="Banco de Mi Mundo - 1000 Mil Pesos">
+    <div class="billete-label">Banco de Mi Mundo · 1000 Mil Pesos · Serie MM2400</div>
+  </div>
+
+  <!-- Dos billetes lado a lado -->
+  <div class="billete-row">
+    <div class="billete-card">
+      <img src="img2_billetes1.png" alt="Banco del Diablo - 1000 Mil Pesos y 100 Dólares">
+      <div class="billete-label">Banco del Diablo · Mil Pesos &amp; 100 — Serie 199X</div>
+    </div>
+    <div class="billete-card">
+      <img src="img3_billetes2.png" alt="Banco del Diablo - Rojo y Dollar">
+      <div class="billete-label">The Bank of Genesis · Diablo Series · MM2400D</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SE BUSCA + ENGRAVING ═════════════════════════ -->
+<div class="feature-row">
+  <div class="feature-card">
+    <img src="img5_se_busca.png" alt="Se Busca - Recompensa $100,000,000">
+    <div class="billete-label">Se Busca · Recompensa $100,000,000</div>
+  </div>
+  <div class="feature-card">
+    <img src="img4_billete_engraving.png" alt="Genesis 1:1 - Billete grabado">
+    <div class="billete-label">Genesis 1:1 · The Bank of Genesis · Grabado Oficial</div>
+  </div>
+</div>
+
+<div class="divider">El Dinero No Duerme</div>
+
+<!-- ═══ TIPOS DE CUENTA ═══════════════════════════════ -->
+<section class="section">
+  <p class="section-label">Elige tu nivel</p>
+  <h2 class="section-title">Tipos de Cuenta</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Cuenta Génesis</h3>
+      <p>Para quienes apenas comienzan su camino creativo. El primer paso es el más difícil. El Diablo lo sabe.</p>
+    </div>
+    <div class="card">
+      <h3>Cuenta Ambición</h3>
+      <p>Para quienes producen, crean y construyen todos los días. La ambición no se pide, se toma.</p>
+    </div>
+    <div class="card">
+      <h3>Cuenta Imperio</h3>
+      <p>Para quienes convierten ideas en movimientos. En el principio, creé mi propio mundo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABRIR CUENTA ══════════════════════════════════ -->
+<section class="section" id="cuenta">
+  <p class="section-label">Ingresa al sistema</p>
+  <h2 class="section-title">Abrir Cuenta</h2>
+
+  <form onsubmit="crearCuenta(event)">
+    <input type="text" id="nombre" placeholder="Nombre artístico" required>
+    <input type="text" id="instagram" placeholder="Instagram">
+    <select id="disciplina">
+      <option>Música</option>
+      <option>Producción Musical</option>
+      <option>Graffiti</option>
+      <option>Tatuaje</option>
+      <option>Diseño</option>
+      <option>Otro</option>
+    </select>
+    <textarea id="ambicion" rows="4" placeholder="¿Cuál es tu ambición?"></textarea>
+    <button type="submit" id="btnSubmit">Crear Cuenta</button>
+  </form>
+
+  <div id="resultado"></div>
+</section>
+
+<!-- ═══ PRINCIPIOS ════════════════════════════════════ -->
+<section class="principios">
+  <p class="section-label">El Código</p>
+  <h2 class="section-title">Principios del Diablo</h2>
+  <ul>
+    <li>Las ideas son la moneda.</li>
+    <li>La ambición es el activo.</li>
+    <li>El dinero es consecuencia.</li>
+    <li>No imprimimos dinero. Imprimimos mentalidades.</li>
+    <li>El Diablo no perdona, solo cobra.</li>
+    <li>La calle enseña, el Diablo firma.</li>
+  </ul>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════ -->
+<footer class="footer">
+  <strong>BANCO DEL DIABLO</strong>
+  Ambición · Dinero · Diablo · Génesis — MM2400 © Serie 199X
+  <div class="note">Proyecto artístico ficticio. Este billete no tiene valor real. Representa ambición y codicia.</div>
+</footer>
+
+<!-- ═══ PANTALLA DE BIENVENIDA (BILLETE) ══════════════ -->
+<div id="pantalla-bienvenida" style="display:none; position:fixed; inset:0; z-index:9999; background:#0b0b0b; overflow-y:auto;">
+  <style>
+    .billete-bienvenida {
+      width: 90%;
+      max-width: 700px;
+      margin: 40px auto;
+      background: #f5ead0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(193,18,31,0.4), 0 0 0 6px #b8962e, 0 0 0 10px #0b0b0b;
+      font-family: 'Oswald', sans-serif;
+      color: #1a1a1a;
+      position: relative;
+    }
+
+    .billete-bienvenida::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(184,150,46,0.4);
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bb-top {
+      background: #1a0a00;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bb-top-left { color: #b8962e; font-size: .7rem; letter-spacing: .3em; }
+    .bb-top-right { color: #c1121f; font-size: 1.6rem; font-weight: 700; letter-spacing: .05em; }
+
+    .bb-body {
+      padding: 32px 36px;
+      position: relative;
+      background:
+        repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(184,150,46,0.04) 40px, rgba(184,150,46,0.04) 41px),
+        repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(193,18,31,0.03) 40px, rgba(193,18,31,0.03) 41px),
+        #f5ead0;
+    }
+
+    .bb-bank-name {
+      text-align: center;
+      font-size: 1.1rem;
+      letter-spacing: .4em;
+      color: #1a0a00;
+      margin-bottom: 4px;
+    }
+
+    .bb-tagline {
+      text-align: center;
+      font-size: .65rem;
+      letter-spacing: .25em;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .bb-welcome {
+      text-align: center;
+      font-size: .7rem;
+      letter-spacing: .3em;
+      color: #b8962e;
+      margin-bottom: 6px;
+    }
+
+    .bb-titular {
+      text-align: center;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      color: #c1121f;
+      line-height: 1;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .bb-instagram {
+      text-align: center;
+      font-size: .85rem;
+      color: #555;
+      letter-spacing: .15em;
+      margin-bottom: 28px;
+    }
+
+    .bb-divider {
+      border: none;
+      border-top: 1px solid rgba(184,150,46,0.4);
+      margin: 20px 0;
+    }
+
+    .bb-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .bb-field {
+      background: rgba(184,150,46,0.08);
+      border: 1px solid rgba(184,150,46,0.3);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+
+    .bb-field-label {
+      font-size: .6rem;
+      letter-spacing: .3em;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .bb-field-value {
+      font-size: 1rem;
+      color: #1a0a00;
+      font-weight: 600;
+    }
+
+    .bb-ambicion {
+      background: rgba(193,18,31,0.06);
+      border: 1px solid rgba(193,18,31,0.2);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+
+    .bb-ambicion-label {
+      font-size: .6rem;
+      letter-spacing: .3em;
+      color: #c1121f;
+      margin-bottom: 6px;
+    }
+
+    .bb-ambicion-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: #1a0a00;
+      line-height: 1.5;
+    }
+
+    .bb-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 8px;
+    }
+
+    .bb-saldo-label { font-size: .6rem; letter-spacing: .2em; color: #888; }
+    .bb-saldo-value { font-size: 1.4rem; color: #b8962e; font-weight: 700; }
+
+    .bb-numero { font-size: .7rem; color: #888; letter-spacing: .2em; }
+
+    .bb-firma {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: #1a0a00;
+      text-align: right;
+    }
+
+    .bb-firma-label {
+      font-size: .55rem;
+      letter-spacing: .2em;
+      color: #888;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    .bb-bottom {
+      background: #1a0a00;
+      padding: 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bb-bottom-text {
+      font-size: .6rem;
+      letter-spacing: .2em;
+      color: #b8962e;
+    }
+
+    .bb-note {
+      font-size: .55rem;
+      color: #555;
+      letter-spacing: .1em;
+    }
+
+    .bb-hint {
+      text-align: center;
+      margin: 24px auto 0;
+      max-width: 700px;
+      color: #666;
+      font-size: .85rem;
+      font-family: 'Source Serif 4', serif;
+      letter-spacing: .02em;
+      padding: 0 20px;
+    }
+
+    .bb-hint strong { color: #b8962e; }
+
+    .bb-btn-volver {
+      display: block;
+      margin: 20px auto 60px;
+      background: transparent;
+      border: 1px solid #333;
+      color: #666;
+      padding: 10px 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+      font-size: .8rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      transition: border-color .2s, color .2s;
+    }
+    .bb-btn-volver:hover { border-color: #666; color: #aaa; }
+  </style>
+
+  <div class="billete-bienvenida" id="billete-card">
+    <div class="bb-top">
+      <div class="bb-top-left">BANCO DEL DIABLO · MM2400 · SERIE 199X</div>
+      <div class="bb-top-right">1000</div>
+    </div>
+    <div class="bb-body">
+      <div class="bb-bank-name">BANCO DEL DIABLO</div>
+      <div class="bb-tagline">AMBICIÓN · DINERO · DIABLO · GÉNESIS</div>
+
+      <div class="bb-welcome">— BIENVENIDO AL SISTEMA —</div>
+      <div class="bb-titular" id="bb-nombre">—</div>
+      <div class="bb-instagram" id="bb-instagram">—</div>
+
+      <hr class="bb-divider">
+
+      <div class="bb-grid">
+        <div class="bb-field">
+          <div class="bb-field-label">Número de Cuenta</div>
+          <div class="bb-field-value" id="bb-numero">—</div>
+        </div>
+        <div class="bb-field">
+          <div class="bb-field-label">Disciplina</div>
+          <div class="bb-field-value" id="bb-disciplina">—</div>
+        </div>
+        <div class="bb-field">
+          <div class="bb-field-label">Nivel</div>
+          <div class="bb-field-value">AMBICIÓN</div>
+        </div>
+        <div class="bb-field">
+          <div class="bb-field-label">Fecha de Apertura</div>
+          <div class="bb-field-value" id="bb-fecha">—</div>
+        </div>
+      </div>
+
+      <div class="bb-ambicion">
+        <div class="bb-ambicion-label">✦ MI AMBICIÓN</div>
+        <div class="bb-ambicion-text" id="bb-ambicion">—</div>
+      </div>
+
+      <div class="bb-footer-row">
+        <div>
+          <div class="bb-saldo-label">Saldo Inicial</div>
+          <div class="bb-saldo-value">10,000 DIABLOS</div>
+          <div class="bb-numero" id="bb-numero2">—</div>
+        </div>
+        <div>
+          <div class="bb-firma">Maicol Dilla</div>
+          <div class="bb-firma-label">DIRECTOR · BANCO DEL DIABLO</div>
+        </div>
+      </div>
+    </div>
+    <div class="bb-bottom">
+      <div class="bb-bottom-text">EL DINERO NO DUERME · LA AMBICIÓN NO SE PIDE, SE TOMA</div>
+      <div class="bb-note">ESTE BILLETE NO TIENE VALOR REAL</div>
+    </div>
+  </div>
+
+  <p class="bb-hint">
+    📸 <strong>Toma captura de pantalla</strong> — este es tu billete oficial del Banco del Diablo.
+  </p>
+  <button class="bb-btn-volver" onclick="cerrarBienvenida()">← Volver al sitio</button>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ugqcletfibpuhybdfyzv.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVncWNsZXRmaWJwdWh5YmRmeXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyODY1OTcsImV4cCI6MjA5NTg2MjU5N30.-JBmuzzPpX9GtxZsgSWdSJmtJAWV6Nun5AlsxIvCvVc";
+
+async function crearCuenta(e) {
+  e.preventDefault();
+
+  const nombre     = document.getElementById("nombre").value.trim();
+  const instagram  = document.getElementById("instagram").value.trim();
+  const disciplina = document.getElementById("disciplina").value;
+  const ambicion   = document.getElementById("ambicion").value.trim();
+  const numero     = "BD-" + Math.floor(Math.random() * 999999).toString().padStart(6, "0");
+  const btn        = document.getElementById("btnSubmit");
+
+  btn.textContent = "Creando cuenta...";
+  btn.disabled = true;
+
+  // Guardar en Supabase en segundo plano
+  try {
+    await fetch(SUPABASE_URL + "/rest/v1/cuentas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ nombre, instagram, disciplina, ambicion })
+    });
+  } catch (err) {
+    console.warn("Supabase:", err);
+  }
+
+  // Redirigir a cuenta.html con los datos en la URL
+  const params = new URLSearchParams({
+    nombre, instagram, disciplina, ambicion, numero
+  });
+  window.location.href = "cuenta.html?" + params.toString();
+}
+
+function cerrarBienvenida() {
+  document.getElementById("pantalla-bienvenida").style.display = "none";
+  document.body.style.overflow = "";
+}
+</script>
+
+</body>
+</html>
