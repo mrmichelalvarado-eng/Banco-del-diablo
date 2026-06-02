@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta Aprobada — Banco del Diablo</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #ff0033;
+  --red-dim: #c1121f;
+  --cyan: #00ffe7;
+  --cyan-dim: #00bfa5;
+  --gold: #b8962e;
+  --purple: #9d00ff;
+  --bg: #050508;
+  --grid: rgba(0,255,231,0.04);
+}
+
+/* ── BG GRID CYBERPUNK ── */
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* scanlines overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── GLITCH PARTICLES ── */
+.particle {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  animation: float linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes float {
+  0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-20px) translateX(30px); opacity: 0; }
+}
+
+/* ── TOP ALERT BAR ── */
+.alert-bar {
+  width: 100%;
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+  font-size: .65rem;
+  letter-spacing: .4em;
+  padding: 8px;
+  text-transform: uppercase;
+  animation: blink-bar 2s infinite;
+  position: relative;
+  z-index: 10;
+}
+@keyframes blink-bar {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .7; }
+}
+
+/* ── HEADER ── */
+.page-header {
+  width: 100%;
+  max-width: 720px;
+  padding: 40px 20px 24px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.system-label {
+  font-size: .65rem;
+  letter-spacing: .5em;
+  color: var(--cyan);
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+.page-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 20px var(--red),
+    0 0 40px var(--red-dim),
+    2px 2px 0 var(--red-dim);
+  margin-bottom: 8px;
+}
+
+.page-title span { color: var(--red); }
+
+.page-sub {
+  font-size: .7rem;
+  letter-spacing: .3em;
+  color: #555;
+}
+
+/* ── BILLETE WRAPPER ── */
+.billete-wrap {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 10;
+}
+
+/* corner decorations */
+.billete-wrap::before,
+.billete-wrap::after {
+  content: '◈';
+  position: absolute;
+  font-size: 1.2rem;
+  color: var(--cyan);
+  text-shadow: 0 0 10px var(--cyan);
+}
+.billete-wrap::before { top: -24px; left: 24px; }
+.billete-wrap::after  { top: -24px; right: 24px; }
+
+/* ── BILLETE ── */
+.billete {
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--cyan-dim);
+  box-shadow:
+    0 0 0 1px var(--bg),
+    0 0 30px rgba(0,255,231,0.15),
+    0 0 80px rgba(193,18,31,0.2),
+    inset 0 0 60px rgba(0,0,0,0.5);
+  position: relative;
+  background: #0a0a0f;
+}
+
+/* ── HOLO STRIP ── */
+.holo {
+  position: absolute;
+  top: 0; right: 44px;
+  width: 18px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    180deg,
+    #ff0080 0px, #ff6600 7px, #ffff00 14px,
+    #00ff88 21px, #0066ff 28px, #9900ff 35px,
+    #ff0080 42px
+  );
+  opacity: .6;
+  animation: holo-shift 3s linear infinite;
+  z-index: 4;
+}
+@keyframes holo-shift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ── BILLETE HEADER ── */
+.bb-head {
+  background: #000;
+  border-bottom: 1px solid var(--red);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.bb-head::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--cyan), transparent);
+}
+
+.bb-head-left {
+  font-size: .6rem;
+  letter-spacing: .3em;
+  color: var(--gold);
+}
+
+.bb-head-center {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .25em;
+  color: #fff;
+  text-shadow: 0 0 10px var(--red);
+}
+
+.bb-head-right {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--red);
+  text-shadow: 0 0 15px var(--red);
+  font-family: 'Oswald', sans-serif;
+}
+
+/* ── BILLETE BODY ── */
+.bb-body {
+  padding: 24px 28px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(193,18,31,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(0,255,231,0.05) 0%, transparent 60%),
+    #0a0a0f;
+}
+
+/* APPROVED BADGE */
+.approved-badge {
+  border: 1px solid var(--cyan);
+  border-radius: 4px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: rgba(0,255,231,0.04);
+  box-shadow: 0 0 20px rgba(0,255,231,0.1), inset 0 0 20px rgba(0,255,231,0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.approved-badge::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,255,231,0.1), transparent);
+  animation: sweep 2.5s infinite;
+}
+@keyframes sweep { to { left: 140%; } }
+
+.badge-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 8px var(--cyan));
+}
+
+.badge-text-wrap {}
+.badge-label { font-size: .55rem; letter-spacing: .4em; color: var(--cyan-dim); }
+.badge-status {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .15em;
+  color: var(--cyan);
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+.badge-pulse {
+  margin-left: auto;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: .5; }
+}
+
+/* DIVIDER */
+.cyber-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+.cyber-divider::before,
+.cyber-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red-dim));
+}
+.cyber-divider::after {
+  background: linear-gradient(90deg, var(--red-dim), transparent);
+}
+.cyber-divider span {
+  font-size: .6rem;
+  letter-spacing: .3em;
+  color: var(--red);
+  white-space: nowrap;
+  text-shadow: 0 0 8px var(--red);
+}
+
+/* NAME */
+.bb-welcome {
+  text-align: center;
+  font-size: .6rem;
+  letter-spacing: .4em;
+  color: var(--cyan-dim);
+  margin-bottom: 6px;
+}
+
+.bb-nombre {
+  font-family: 'Oswald', sans-serif;
+  text-align: center;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: .05em;
+  line-height: 1;
+  margin-bottom: 6px;
+  text-shadow:
+    0 0 20px var(--red),
+    0 0 40px rgba(193,18,31,0.4);
+  animation: glitch-name 6s infinite;
+}
+
+@keyframes glitch-name {
+  0%,94%,100% { text-shadow: 0 0 20px var(--red), 0 0 40px rgba(193,18,31,0.4); transform: none; }
+  95% { transform: translate(-2px, 0); text-shadow: 2px 0 var(--cyan), -2px 0 var(--red); }
+  97% { transform: translate(2px, 0); text-shadow: -2px 0 var(--cyan), 2px 0 var(--red); }
+}
+
+.bb-instagram {
+  text-align: center;
+  font-size: .8rem;
+  color: var(--cyan-dim);
+  letter-spacing: .2em;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px var(--cyan-dim);
+}
+
+/* GRID */
+.bb-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bb-field {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(0,255,231,0.15);
+  border-radius: 4px;
+  padding: 10px 14px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+
+.bb-field:hover { border-color: rgba(0,255,231,0.4); }
+
+.bb-field::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+}
+
+.bb-field-label {
+  font-size: .5rem;
+  letter-spacing: .35em;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.bb-field-value {
+  font-size: .9rem;
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0,255,231,0.4);
+  letter-spacing: .05em;
+}
+
+/* AMBICION */
+.bb-ambicion-box {
+  border: 1px solid rgba(193,18,31,0.4);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  background: rgba(193,18,31,0.04);
+  position: relative;
+}
+
+.bb-ambicion-box::before {
+  content: '⛧';
+  position: absolute;
+  top: 10px; right: 14px;
+  font-size: 1rem;
+  color: var(--red);
+  opacity: .4;
+}
+
+.bb-amb-label {
+  font-size: .55rem;
+  letter-spacing: .4em;
+  color: var(--red);
+  text-shadow: 0 0 8px var(--red);
+  margin-bottom: 8px;
+}
+
+.bb-amb-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: .9rem;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+/* FOOTER ROW */
+.bb-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.bb-saldo-label { font-size: .5rem; letter-spacing: .3em; color: #555; }
+.bb-saldo-val {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  color: var(--gold);
+  text-shadow: 0 0 10px var(--gold);
+  letter-spacing: .05em;
+}
+.bb-num-small { font-size: .6rem; color: #444; letter-spacing: .15em; margin-top: 3px; }
+
+.bb-firma-wrap { text-align: right; }
+.bb-firma {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: #888;
+}
+.bb-firma-sub { font-size: .5rem; letter-spacing: .2em; color: #444; margin-top: 2px; }
+
+/* BILLETE FOOTER */
+.bb-foot {
+  background: #000;
+  border-top: 1px solid var(--red-dim);
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  position: relative;
+}
+
+.bb-foot::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--cyan), transparent);
+}
+
+.bb-foot-txt { font-size: .55rem; letter-spacing: .18em; color: var(--gold); }
+.bb-foot-note { font-size: .5rem; color: #333; letter-spacing: .1em; }
+
+/* ── BOTTOM DECO ── */
+.cyber-deco {
+  width: 100%;
+  max-width: 680px;
+  padding: 20px 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.deco-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red-dim));
+}
+.deco-line.right {
+  background: linear-gradient(90deg, var(--red-dim), transparent);
+}
+.deco-center {
+  font-size: .65rem;
+  letter-spacing: .4em;
+  color: var(--red);
+  text-shadow: 0 0 8px var(--red);
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+/* ── SCREENSHOT HINT ── */
+.screenshot-hint {
+  width: 100%;
+  max-width: 680px;
+  margin: 24px 16px 0;
+  border: 1px solid rgba(0,255,231,0.2);
+  border-radius: 6px;
+  padding: 16px 20px;
+  background: rgba(0,255,231,0.03);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 10;
+}
+
+.hint-icon { font-size: 1.8rem; filter: drop-shadow(0 0 6px var(--cyan)); }
+.hint-text .hint-title {
+  font-size: .75rem;
+  letter-spacing: .25em;
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
+  margin-bottom: 4px;
+}
+.hint-text .hint-sub { font-size: .6rem; color: #555; letter-spacing: .1em; }
+
+/* ── BUTTONS ── */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin: 20px 16px 80px;
+  width: 100%;
+  max-width: 680px;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-volver {
+  flex: 1;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  transition: border-color .2s, color .2s;
+}
+.btn-volver:hover { border-color: #666; color: #aaa; }
+
+.btn-share {
+  flex: 1;
+  padding: 14px;
+  background: var(--red);
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  transition: background .2s;
+  box-shadow: 0 0 20px rgba(193,18,31,0.4);
+}
+.btn-share::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: sweep 2s infinite;
+}
+.btn-share:hover { background: #7a0c15; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .bb-body { padding: 18px 16px; }
+  .bb-grid { grid-template-columns: 1fr; }
+  .bb-head-center { display: none; }
+  .btn-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- particles -->
+<div id="particles"></div>
+
+<div class="alert-bar">⚠ SISTEMA ACTIVO — BANCO DEL DIABLO — CUENTA REGISTRADA ⚠</div>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="system-label">// SISTEMA BANCO DEL DIABLO //</div>
+  <div class="page-title"><span>CUENTA</span> APROBADA</div>
+  <div class="page-sub">MM2400 · SERIE 199X · GÉNESIS 1:1</div>
+</div>
+
+<!-- BILLETE -->
+<div class="billete-wrap">
+<div class="billete">
+  <div class="holo"></div>
+
+  <div class="bb-head">
+    <div class="bb-head-left">BANCO DEL DIABLO · MM2400 · SERIE 199X</div>
+    <div class="bb-head-center">⛧ B·D ⛧</div>
+    <div class="bb-head-right">1000</div>
+  </div>
+
+  <div class="bb-body">
+
+    <div class="approved-badge">
+      <div class="badge-icon">👁</div>
+      <div class="badge-text-wrap">
+        <div class="badge-label">ESTADO DE CUENTA</div>
+        <div class="badge-status">✦ CUENTA APROBADA</div>
+      </div>
+      <div class="badge-pulse"></div>
+    </div>
+
+    <div class="cyber-divider"><span>— BIENVENIDO AL SISTEMA —</span></div>
+
+    <div class="bb-nombre" id="p-nombre">—</div>
+    <div class="bb-instagram" id="p-instagram">—</div>
+
+    <div class="bb-grid">
+      <div class="bb-field">
+        <div class="bb-field-label">NÚMERO DE CUENTA</div>
+        <div class="bb-field-value" id="p-numero">—</div>
+      </div>
+      <div class="bb-field">
+        <div class="bb-field-label">DISCIPLINA</div>
+        <div class="bb-field-value" id="p-disciplina">—</div>
+      </div>
+      <div class="bb-field">
+        <div class="bb-field-label">NIVEL</div>
+        <div class="bb-field-value">AMBICIÓN</div>
+      </div>
+      <div class="bb-field">
+        <div class="bb-field-label">FECHA DE APERTURA</div>
+        <div class="bb-field-value" id="p-fecha">—</div>
+      </div>
+    </div>
+
+    <div class="bb-ambicion-box">
+      <div class="bb-amb-label">⛧ MI AMBICIÓN</div>
+      <div class="bb-amb-text" id="p-ambicion">—</div>
+    </div>
+
+    <div class="cyber-divider"><span>— SALDO —</span></div>
+
+    <div class="bb-footer-row">
+      <div>
+        <div class="bb-saldo-label">SALDO INICIAL</div>
+        <div class="bb-saldo-val">10,000 DIABLOS</div>
+        <div class="bb-num-small" id="p-numero2">—</div>
+      </div>
+      <div class="bb-firma-wrap">
+        <div class="bb-firma">Maicol Dilla</div>
+        <div class="bb-firma-sub">DIRECTOR · BANCO DEL DIABLO</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bb-foot">
+    <div class="bb-foot-txt">EL DINERO NO DUERME · LA AMBICIÓN NO SE PIDE, SE TOMA</div>
+    <div class="bb-foot-note">ESTE BILLETE NO TIENE VALOR REAL</div>
+  </div>
+</div>
+</div>
+
+<!-- DECO LINE -->
+<div class="cyber-deco">
+  <div class="deco-line"></div>
+  <div class="deco-center">⛧ AMBICIÓN · DINERO · DIABLO · GÉNESIS ⛧</div>
+  <div class="deco-line right"></div>
+</div>
+
+<!-- SCREENSHOT HINT -->
+<div class="screenshot-hint">
+  <div class="hint-icon">📸</div>
+  <div class="hint-text">
+    <div class="hint-title">TOMA CAPTURA DE PANTALLA</div>
+    <div class="hint-sub">Este es tu billete oficial del Banco del Diablo — guárdalo y compártelo</div>
+  </div>
+</div>
+
+<!-- BUTTONS -->
+<div class="btn-row">
+  <a href="index.html" class="btn-volver">← Volver</a>
+  <button class="btn-share" onclick="compartir()">⬆ Compartir billete</button>
+</div>
+
+<script>
+// Partículas flotantes
+const colors = ['#ff0033','#00ffe7','#9d00ff','#b8962e'];
+const container = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `
+    left: ${Math.random()*100}vw;
+    background: ${colors[Math.floor(Math.random()*colors.length)]};
+    box-shadow: 0 0 4px ${colors[Math.floor(Math.random()*colors.length)]};
+    animation-duration: ${6 + Math.random()*10}s;
+    animation-delay: ${Math.random()*8}s;
+    width: ${1+Math.random()*2}px;
+    height: ${1+Math.random()*2}px;
+  `;
+  container.appendChild(p);
+}
+
+// Leer datos de la URL
+const params     = new URLSearchParams(window.location.search);
+const nombre     = params.get("nombre")     || "USUARIO";
+const instagram  = params.get("instagram")  || "";
+const disciplina = params.get("disciplina") || "—";
+const ambicion   = params.get("ambicion")   || "La ambición no se pide, se toma.";
+const numero     = params.get("numero")     || "BD-000000";
+const hoy        = new Date().toLocaleDateString("es-MX", { day:"2-digit", month:"short", year:"numeric" });
+
+document.getElementById("p-nombre").textContent     = nombre;
+document.getElementById("p-instagram").textContent  = instagram ? "@" + instagram.replace("@","") : "";
+document.getElementById("p-numero").textContent     = numero;
+document.getElementById("p-numero2").textContent    = numero;
+document.getElementById("p-disciplina").textContent = disciplina;
+document.getElementById("p-ambicion").textContent   = ambicion;
+document.getElementById("p-fecha").textContent      = hoy;
+
+// Compartir
+function compartir() {
+  if (navigator.share) {
+    navigator.share({
+      title: "Banco del Diablo — Mi Cuenta",
+      text: `${nombre} acaba de abrir su cuenta en el Banco del Diablo. Número: ${numero} 🔥`,
+      url: window.location.href
+    });
+  } else {
+    navigator.clipboard.writeText(window.location.href);
+    alert("✓ Link copiado al portapapeles");
+  }
+}
+</script>
+</body>
+</html>
